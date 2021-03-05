@@ -12,7 +12,7 @@ static git_repository *repo;
 
 static const char *relpath = "";
 
-static char description[255] = "Repositories";
+static char description[255] = "Репозиторијуми";
 static char *name = "";
 static char owner[255];
 
@@ -77,8 +77,8 @@ writeheader(FILE *fp)
 	fputs("</span></td></tr><tr><td></td><td>\n"
 		"</td></tr>\n</table>\n<hr/>\n<div id=\"content\">\n"
 		"<table id=\"index\"><thead>\n"
-		"<tr><td><b>Name</b></td><td><b>Description</b></td><td><b>Owner</b></td>"
-		"<td><b>Last commit</b></td></tr>"
+		"<tr><td><b>Назив</b></td><td><b>Опис</b></td><td><b>Власник</b></td>"
+		"<td><b>Последње чување</b></td></tr>"
 		"</thead><tbody>\n", fp);
 }
 

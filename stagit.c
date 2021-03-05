@@ -480,17 +480,17 @@ writeheader(FILE *fp, const char *title)
 		fputs("</a></td></tr>", fp);
 	}
 	fputs("<tr><td></td><td>\n", fp);
-	fprintf(fp, "<a href=\"%slog.html\">Log</a> | ", relpath);
-	fprintf(fp, "<a href=\"%sfiles.html\">Files</a> | ", relpath);
-	fprintf(fp, "<a href=\"%srefs.html\">Refs</a>", relpath);
+	fprintf(fp, "<a href=\"%slog.html\">Дневник</a> | ", relpath);
+	fprintf(fp, "<a href=\"%sfiles.html\">Датотеке</a> | ", relpath);
+	fprintf(fp, "<a href=\"%srefs.html\">Референце</a>", relpath);
 	if (submodules)
-		fprintf(fp, " | <a href=\"%sfile/%s.html\">Submodules</a>",
+		fprintf(fp, " | <a href=\"%sfile/%s.html\">Подмодули</a>",
 		        relpath, submodules);
 	if (readme)
-		fprintf(fp, " | <a href=\"%sfile/%s.html\">README</a>",
+		fprintf(fp, " | <a href=\"%sfile/%s.html\">ПРОЧИТАЈМЕ</a>",
 		        relpath, readme);
 	if (license)
-		fprintf(fp, " | <a href=\"%sfile/%s.html\">LICENSE</a>",
+		fprintf(fp, " | <a href=\"%sfile/%s.html\">ЛИЦЕНЦА</a>",
 		        relpath, license);
 	fputs("</td></tr></table>\n<hr/>\n<div id=\"content\">\n", fp);
 }
@@ -536,21 +536,21 @@ writeblobhtml(FILE *fp, const git_blob *blob)
 void
 printcommit(FILE *fp, struct commitinfo *ci)
 {
-	fprintf(fp, "<b>commit</b> <a href=\"%scommit/%s.html\">%s</a>\n",
+	fprintf(fp, "<b>чување</b> <a href=\"%scommit/%s.html\">%s</a>\n",
 		relpath, ci->oid, ci->oid);
 
 	if (ci->parentoid[0])
-		fprintf(fp, "<b>parent</b> <a href=\"%scommit/%s.html\">%s</a>\n",
+		fprintf(fp, "<b>родитељ</b> <a href=\"%scommit/%s.html\">%s</a>\n",
 			relpath, ci->parentoid, ci->parentoid);
 
 	if (ci->author) {
-		fputs("<b>Author:</b> ", fp);
+		fputs("<b>Аутор:</b> ", fp);
 		xmlencode(fp, ci->author->name, strlen(ci->author->name));
 		fputs(" &lt;<a href=\"mailto:", fp);
 		xmlencode(fp, ci->author->email, strlen(ci->author->email));
 		fputs("\">", fp);
 		xmlencode(fp, ci->author->email, strlen(ci->author->email));
-		fputs("</a>&gt;\n<b>Date:</b>   ", fp);
+		fputs("</a>&gt;\n<b>Датум:</b>   ", fp);
 		printtime(fp, &(ci->author->when));
 		putc('\n', fp);
 	}
@@ -581,7 +581,7 @@ printshowfile(FILE *fp, struct commitinfo *ci)
 	    ci->ndeltas   > 1000   ||
 	    ci->addcount  > 100000 ||
 	    ci->delcount  > 100000) {
-		fputs("Diff is too large, output suppressed.\n", fp);
+		fputs("Diff је превелики, излаз онемогућен.\n", fp);
 		return;
 	}
 
@@ -631,10 +631,10 @@ printshowfile(FILE *fp, struct commitinfo *ci)
 		fwrite(&linestr[add], 1, del, fp);
 		fputs("</span></td></tr>\n", fp);
 	}
-	fprintf(fp, "</table></pre><pre>%zu file%s changed, %zu insertion%s(+), %zu deletion%s(-)\n",
-		ci->filecount, ci->filecount == 1 ? "" : "s",
-	        ci->addcount,  ci->addcount  == 1 ? "" : "s",
-	        ci->delcount,  ci->delcount  == 1 ? "" : "s");
+	fprintf(fp, "</table></pre><pre>измењених датотека: %zu, додавања: %zu(+), брисања: %zu(-)\n",
+		ci->filecount,// ci->filecount == 1 ? "" : "/е",
+	        ci->addcount,//  ci->addcount  == 1 ? "" : "/а",
+	        ci->delcount);//,  ci->delcount  == 1 ? "" : "/а");
 
 	fputs("<hr/>", fp);
 
@@ -653,7 +653,7 @@ printshowfile(FILE *fp, struct commitinfo *ci)
 
 		/* check binary data */
 		if (delta->flags & GIT_DIFF_FLAG_BINARY) {
-			fputs("Binary files differ.\n", fp);
+			fputs("Бинарне датотеке се разликују.\n", fp);
 			continue;
 		}
 
@@ -732,7 +732,7 @@ writelog(FILE *fp, const git_oid *oid)
 		git_oid_tostr(oidstr, sizeof(oidstr), &id);
 		r = snprintf(path, sizeof(path), "commit/%s.html", oidstr);
 		if (r < 0 || (size_t)r >= sizeof(path))
-			errx(1, "path truncated: 'commit/%s.html'", oidstr);
+			errx(1, "путања скраћена: 'commit/%s.html'", oidstr);
 		r = access(path, F_OK);
 
 		/* optimization: if there are no log lines to write and
@@ -753,7 +753,7 @@ writelog(FILE *fp, const git_oid *oid)
 			nlogcommits--;
 			if (!nlogcommits && ci->parentoid[0])
 				fputs("<tr><td></td><td colspan=\"5\">"
-				      "More commits remaining [...]</td>"
+				      "Има још чувања[...]</td>"
 				      "</tr>\n", fp);
 		}
 
@@ -819,15 +819,15 @@ printcommitatom(FILE *fp, struct commitinfo *ci, const char *tag)
 	}
 
 	fputs("<content type=\"text\">", fp);
-	fprintf(fp, "commit %s\n", ci->oid);
+	fprintf(fp, "чување %s\n", ci->oid);
 	if (ci->parentoid[0])
-		fprintf(fp, "parent %s\n", ci->parentoid);
+		fprintf(fp, "родитељ %s\n", ci->parentoid);
 	if (ci->author) {
-		fputs("Author: ", fp);
+		fputs("Аутор: ", fp);
 		xmlencode(fp, ci->author->name, strlen(ci->author->name));
 		fputs(" &lt;", fp);
 		xmlencode(fp, ci->author->email, strlen(ci->author->email));
-		fputs("&gt;\nDate:   ", fp);
+		fputs("&gt;\nДатум:   ", fp);
 		printtime(fp, &(ci->author->when));
 		putc('\n', fp);
 	}
@@ -851,7 +851,7 @@ writeatom(FILE *fp, int all)
 	fputs("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 	      "<feed xmlns=\"http://www.w3.org/2005/Atom\">\n<title>", fp);
 	xmlencode(fp, strippedname, strlen(strippedname));
-	fputs(", branch HEAD</title>\n<subtitle>", fp);
+	fputs(", грана ГЛАВНА</title>\n<subtitle>", fp);
 	xmlencode(fp, description, strlen(description));
 	fputs("</subtitle>\n", fp);
 
@@ -894,7 +894,7 @@ writeblob(git_object *obj, const char *fpath, const char *filename, size_t files
 	FILE *fp;
 
 	if (strlcpy(tmp, fpath, sizeof(tmp)) >= sizeof(tmp))
-		errx(1, "path truncated: '%s'", fpath);
+		errx(1, "путања скраћена: '%s'", fpath);
 	if (!(d = dirname(tmp)))
 		err(1, "dirname");
 	if (mkdirp(d))
@@ -902,7 +902,7 @@ writeblob(git_object *obj, const char *fpath, const char *filename, size_t files
 
 	for (p = fpath, tmp[0] = '\0'; *p; p++) {
 		if (*p == '/' && strlcat(tmp, "../", sizeof(tmp)) >= sizeof(tmp))
-			errx(1, "path truncated: '../%s'", tmp);
+			errx(1, "путања скраћена: '../%s'", tmp);
 	}
 	relpath = tmp;
 
@@ -914,7 +914,7 @@ writeblob(git_object *obj, const char *fpath, const char *filename, size_t files
 	fputs("</p><hr/>", fp);
 
 	if (git_blob_is_binary((git_blob *)obj)) {
-		fputs("<p>Binary file.</p>\n", fp);
+		fputs("<p>Бинарна датотека.</p>\n", fp);
 	} else {
 		lc = writeblobhtml(fp, (git_blob *)obj);
 		if (ferror(fp))
@@ -990,7 +990,7 @@ writefilestree(FILE *fp, git_tree *tree, const char *path)
 		r = snprintf(filepath, sizeof(filepath), "file/%s.html",
 		         entrypath);
 		if (r < 0 || (size_t)r >= sizeof(filepath))
-			errx(1, "path truncated: 'file/%s.html'", entrypath);
+			errx(1, "путања скраћена: 'file/%s.html'", entrypath);
 
 		if (!git_tree_entry_to_object(&obj, repo, entry)) {
 			switch (git_object_type(obj)) {
@@ -1020,7 +1020,7 @@ writefilestree(FILE *fp, git_tree *tree, const char *path)
 			xmlencode(fp, entrypath, strlen(entrypath));
 			fputs("</a></td><td class=\"num\" align=\"right\">", fp);
 			if (lc > 0)
-				fprintf(fp, "%zuL", lc);
+				fprintf(fp, "%zuЛ", lc);
 			else
 				fprintf(fp, "%zuB", filesize);
 			fputs("</td></tr>\n", fp);
@@ -1048,8 +1048,8 @@ writefiles(FILE *fp, const git_oid *id)
 	int ret = -1;
 
 	fputs("<table id=\"files\"><thead>\n<tr>"
-	      "<td><b>Mode</b></td><td><b>Name</b></td>"
-	      "<td class=\"num\" align=\"right\"><b>Size</b></td>"
+	      "<td><b>Режим</b></td><td><b>Назив</b></td>"
+	      "<td class=\"num\" align=\"right\"><b>Величина</b></td>"
 	      "</tr>\n</thead><tbody>\n", fp);
 
 	if (!git_commit_lookup(&commit, repo, id) &&
@@ -1070,7 +1070,7 @@ writerefs(FILE *fp)
 	struct referenceinfo *ris = NULL;
 	struct commitinfo *ci;
 	size_t count, i, j, refcount;
-	const char *titles[] = { "Branches", "Tags" };
+	const char *titles[] = { "Гране", "Ознаке" };
 	const char *ids[] = { "branches", "tags" };
 	const char *s;
 
@@ -1088,9 +1088,9 @@ writerefs(FILE *fp)
 		/* print header if it has an entry (first). */
 		if (++count == 1) {
 			fprintf(fp, "<h2>%s</h2><table id=\"%s\">"
-		                "<thead>\n<tr><td><b>Name</b></td>"
-			        "<td><b>Last commit date</b></td>"
-			        "<td><b>Author</b></td>\n</tr>\n"
+		                "<thead>\n<tr><td><b>Назив</b></td>"
+			        "<td><b>Датум последњег чувања</b></td>"
+			        "<td><b>Аутор</b></td>\n</tr>\n"
 			        "</thead><tbody>\n",
 			         titles[j], ids[j]);
 		}
@@ -1259,9 +1259,9 @@ main(int argc, char *argv[])
 	relpath = "";
 	mkdir("commit", S_IRWXU | S_IRWXG | S_IRWXO);
 	writeheader(fp, "Log");
-	fputs("<table id=\"log\"><thead>\n<tr><td><b>Date</b></td>"
-	      "<td><b>Commit message</b></td>"
-	      "<td><b>Author</b></td><td class=\"num\" align=\"right\"><b>Files</b></td>"
+	fputs("<table id=\"log\"><thead>\n<tr><td><b>Датум</b></td>"
+	      "<td><b>Порука чувања</b></td>"
+	      "<td><b>Аутор</b></td><td class=\"num\" align=\"right\"><b>Датотеке</b></td>"
 	      "<td class=\"num\" align=\"right\"><b>+</b></td>"
 	      "<td class=\"num\" align=\"right\"><b>-</b></td></tr>\n</thead><tbody>\n", fp);
 
@@ -1309,7 +1309,7 @@ main(int argc, char *argv[])
 
 	/* files for HEAD */
 	fp = efopen("files.html", "w");
-	writeheader(fp, "Files");
+	writeheader(fp, "Датотеке");
 	if (head)
 		writefiles(fp, head);
 	writefooter(fp);
@@ -1317,7 +1317,7 @@ main(int argc, char *argv[])
 
 	/* summary page with branches and tags */
 	fp = efopen("refs.html", "w");
-	writeheader(fp, "Refs");
+	writeheader(fp, "Референце");
 	writerefs(fp);
 	writefooter(fp);
 	fclose(fp);

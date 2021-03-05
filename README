@@ -6,6 +6,12 @@ static git page generator.
 It generates static HTML pages for a git repository.
 
 
+Changes to the original
+-----------------------
+
+Translations of strings to Serbian.
+
+
 Usage
 -----
 
